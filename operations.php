@@ -10,7 +10,7 @@ function findLowerClosestKey($search , $arr) {
     foreach ($copy as $key => $value) {
         if($key == 0) continue;
 
-        if($search > $copy[$key-1] && $search < $value) {
+        if($search >= $copy[$key-1] && $search < $value) {
             return array_search($copy[$key-1], $arr);
         }
     }
