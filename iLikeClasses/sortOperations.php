@@ -1,6 +1,17 @@
 <?php
 
-abstract class SortOperations {
+abstract class Pushswap {
+
+    protected $la = [];
+    protected $lb = [];
+    protected $res = [];
+    
+    function __construct($list)
+    {
+        $this->la = $list;
+    }
+
+    abstract public function sort();
 
     protected function sa($print = true) {
         if(count($this->la) < 2) return;

@@ -2,20 +2,23 @@
 
 include_once('./sortOperations.php');
 
-class PushSwap extends SortOperations
+class MySort extends Pushswap
 {
-
-    protected $la = [];
-    protected $lb = [];
-    protected $res = [];
-
-    function __construct($list)
+    public function sort()
     {
-        $this->la = $list;
-    }
+        $copy = $this->la;
+        sort($copy);
+        if ($this->la == $copy) {
+            return $this->res;
+        }
 
-    public function mySort()
-    {
+        if (count($this->la) == 2) {
+            if (array_search(min($this->la), $this->la) == 1) {
+                $this->sa();
+            }
+            return $this->res;
+        }
+
         while (count($this->la) - 3) {
             $laLength = count($this->la);
             $searchRange = ceil($laLength / 10) >= 3 ? ceil($laLength / 10) : 3;
@@ -25,10 +28,10 @@ class PushSwap extends SortOperations
             $minEnd = min($laEnd);
             $minStartKey = array_search($minStart, $laStart);
             $minEndKey = $laLength - array_search($minEnd, $laEnd);
-        
+
             if ($minStart < $minEnd) {
                 $lbKey = $this->findLowerClosestKey($minStart, $this->lb);
-        
+
                 if ($lbKey <= $minStartKey) {
                     for ($i = 0; $i < $lbKey; $i++) {
                         $this->rr();
@@ -55,7 +58,7 @@ class PushSwap extends SortOperations
             } else {
                 $lbKeyR = $this->findLowerClosestKey($minEnd, $this->lb);
                 $lbKey = count($this->lb) - $lbKeyR;
-        
+
                 if ($lbKey <= $minEndKey) {
                     for ($i = 0; $i < $lbKey; $i++) {
                         $this->rrr();
@@ -79,11 +82,11 @@ class PushSwap extends SortOperations
                     }
                 }
             }
-        
+
             $this->pb();
         }
 
-        if(count($this->la)) $this->threeNumberSort($this->la);
+        if (count($this->la) == 3) $this->threeNumberSort($this->la);
 
         $this->allLBtoLA();
 
@@ -111,7 +114,8 @@ class PushSwap extends SortOperations
         }
     }
 
-    protected function allLBtoLA() {
+    protected function allLBtoLA()
+    {
         while (count($this->lb)) {
             $this->pa();
         }
@@ -135,7 +139,8 @@ class PushSwap extends SortOperations
 }
 
 //create random array
-function createRandomArray($start, $end) {
+function createRandomArray($start, $end)
+{
     $rand = range($start, $end);
     shuffle($rand);
     return $rand;
@@ -144,18 +149,18 @@ function createRandomArray($start, $end) {
 $min = 0;
 $avg = [];
 
-for($i = 0; $i < 1000; $i++) {
+for ($i = 0; $i < 1000; $i++) {
     $la = createRandomArray(1, 999);
     $la = array_slice($la, 0, 100);
 
-    $push = new PushSwap($la);
-    $resArray = $push->mySort();
+    $pushswap = new MySort($la);
+    $resArray = $pushswap->sort();
 
     $avg[] = count($resArray);
-    
-    if($i == 0) {
+
+    if ($i == 0) {
         $min = count($resArray);
-    } else if(count($resArray) < $min) {
+    } else if (count($resArray) < $min) {
         $min = count($resArray);
     }
 }
