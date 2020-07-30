@@ -1,141 +1,171 @@
 <?php
 
-include_once('./operations.php');
+include_once('./sortOperations.php');
 
-array_shift($argv);
-$la = $argv;
-$lb = [];
+class MySort extends Pushswap
+{
+    public function sort()
+    {
+        $copy = $this->la;
+        sort($copy);
+        if ($this->la == $copy) {
+            return $this->res;
+        }
 
-$result = [];
+        if (count($this->la) == 2) {
+            if (array_search(min($this->la), $this->la) == 1) {
+                $this->sa();
+            }
+            return $this->res;
+        }
 
-//array de test
-// $la = createRandomArray(1, 999);
-// $la = array_slice($la, 0, 100);
+        while (count($this->la) - 3) {
+            $laLength = count($this->la);
+            $searchRange = ceil($laLength / 10) >= 3 ? ceil($laLength / 10) : 3;
+            $laStart = array_slice($this->la, 0, $searchRange, true);
+            $laEnd = array_slice($this->la, $laLength - $searchRange, null, true);
+            $minStart = min($laStart);
+            $minEnd = min($laEnd);
+            $minStartKey = array_search($minStart, $laStart);
+            $minEndKey = $laLength - array_search($minEnd, $laEnd);
 
-$laCopyOne = $la;
-sort($laCopyOne);
+            if ($minStart < $minEnd) {
+                $lbKey = $this->findLowerClosestKey($minStart, $this->lb);
 
-if ($la == $laCopyOne) {
-    echo "\n";
-    exit();
-}
-if (count($la) == 2) {
-    if (array_search(min($la), $la) == 1) {
-        sa($la, $lb);
-        $result[] = "sa";
+                if ($lbKey <= $minStartKey) {
+                    for ($i = 0; $i < $lbKey; $i++) {
+                        $this->rr();
+                    }
+                    for ($i = 0; $i < $minStartKey - $lbKey; $i++) {
+                        $this->ra();
+                    }
+                } else if ($lbKey < count($this->lb) / 2) {
+                    for ($i = 0; $i < $minStartKey; $i++) {
+                        $this->rr();
+                    }
+                    for ($i = 0; $i < $lbKey - $minStartKey; $i++) {
+                        $this->rb();
+                    }
+                } else {
+                    $lbLength = count($this->lb);
+                    for ($i = 0; $i < $lbLength - $lbKey; $i++) {
+                        $this->rrb();
+                    }
+                    for ($i = 0; $i < $minStartKey; $i++) {
+                        $this->ra();
+                    }
+                }
+            } else {
+                $lbKeyR = $this->findLowerClosestKey($minEnd, $this->lb);
+                $lbKey = count($this->lb) - $lbKeyR;
+
+                if ($lbKey <= $minEndKey) {
+                    for ($i = 0; $i < $lbKey; $i++) {
+                        $this->rrr();
+                    }
+                    for ($i = 0; $i < $minEndKey - $lbKey; $i++) {
+                        $this->rra();
+                    }
+                } else if ($lbKeyR > count($this->lb) / 2) {
+                    for ($i = 0; $i < $minEndKey; $i++) {
+                        $this->rrr();
+                    }
+                    for ($i = 0; $i < $lbKey - $minEndKey; $i++) {
+                        $this->rrb();
+                    }
+                } else {
+                    for ($i = 0; $i < $lbKeyR; $i++) {
+                        $this->rb();
+                    }
+                    for ($i = 0; $i < $minEndKey; $i++) {
+                        $this->rra();
+                    }
+                }
+            }
+
+            $this->pb();
+        }
+
+        if (count($this->la) == 3) $this->threeNumberSort($this->la);
+
+        $this->allLBtoLA();
+
+        return $this->res;
     }
-    echo implode(" ", $result) . "\n";
-    exit();
-}
 
-while (count($la) - 3) {
-    $laLength = count($la);
-    $searchRange = ceil($laLength / 10) >= 3 ? ceil($laLength / 10) : 3;
-    $laStart = array_slice($la, 0, $searchRange, true);
-    $laEnd = array_slice($la, $laLength - $searchRange, null, true);
-    $minStart = min($laStart);
-    $minEnd = min($laEnd);
-    $minStartKey = array_search($minStart, $laStart);
-    $minEndKey = $laLength - array_search($minEnd, $laEnd);
-
-    if ($minStart < $minEnd) {
-        $lbKey = findLowerClosestKey($minStart, $lb);
-
-        if ($lbKey <= $minStartKey) {
-            for ($i = 0; $i < $lbKey; $i++) {
-                rr($la, $lb);
-                $result[] = "rr";
-            }
-            for ($i = 0; $i < $minStartKey - $lbKey; $i++) {
-                ra($la, $lb);
-                $result[] = "ra";
-            }
-        } else if ($lbKey < count($lb) / 2) {
-            for ($i = 0; $i < $minStartKey; $i++) {
-                rr($la, $lb);
-                $result[] = "rr";
-            }
-            for ($i = 0; $i < $lbKey - $minStartKey; $i++) {
-                rb($la, $lb);
-                $result[] = "rb";
-            }
-        } else {
-            $lbLength = count($lb);
-            for ($i = 0; $i < $lbLength - $lbKey; $i++) {
-                rrb($la, $lb);
-                $result[] = "rrb";
-            }
-            for ($i = 0; $i < $minStartKey; $i++) {
-                ra($la, $lb);
-                $result[] = "ra";
+    protected function threeNumberSort(array $array)
+    {
+        $copy = $array;
+        sort($copy);
+        if ($array != $copy) {
+            if (array_search(max($array), $array) == 2 && array_search(min($array), $array) == 1) {
+                $this->sa();
+            } else if (array_search(max($array), $array) == 0 && array_search(min($array), $array) == 1) {
+                $this->ra();
+            } else if (array_search(max($array), $array) == 0 && array_search(min($array), $array) == 2) {
+                $this->sa();
+                $this->rra();
+            } else if (array_search(max($array), $array) == 1 && array_search(min($array), $array) == 0) {
+                $this->sa();
+                $this->ra();
+            } else if (array_search(max($array), $array) == 1 && array_search(min($array), $array) == 2) {
+                $this->rra();
             }
         }
-    } else {
-        $lbKeyR = findLowerClosestKey($minEnd, $lb);
-        $lbKey = count($lb) - $lbKeyR;
+    }
 
-        if ($lbKey <= $minEndKey) {
-            for ($i = 0; $i < $lbKey; $i++) {
-                rrr($la, $lb);
-                $result[] = "rrr";
-            }
-            for ($i = 0; $i < $minEndKey - $lbKey; $i++) {
-                rra($la, $lb);
-                $result[] = "rra";
-            }
-        } else if ($lbKeyR > count($lb) / 2) {
-            for ($i = 0; $i < $minEndKey; $i++) {
-                rrr($la, $lb);
-                $result[] = "rrr";
-            }
-            for ($i = 0; $i < $lbKey - $minEndKey; $i++) {
-                rrb($la, $lb);
-                $result[] = "rrb";
-            }
-        } else {
-            for ($i = 0; $i < $lbKeyR; $i++) {
-                rb($la, $lb);
-                $result[] = "rb";
-            }
-            for ($i = 0; $i < $minEndKey; $i++) {
-                rra($la, $lb);
-                $result[] = "rra";
-            }
+    protected function allLBtoLA()
+    {
+        while (count($this->lb)) {
+            $this->pa();
         }
     }
 
-    pb($la, $lb);
-    $result[] = "pb";
-}
+    protected function findLowerClosestKey($search, $arr)
+    {
+        $copy = $arr;
+        sort($copy);
+        if (count($arr) <= 1) return 0;
 
-$laCopy = $la;
-sort($laCopy);
-if ($la != $laCopy) {
-    if (array_search(max($la), $la) == 2 && array_search(min($la), $la) == 1) {
-        sa($la, $lb);
-        $result[] = "sa";
-    } else if (array_search(max($la), $la) == 0 && array_search(min($la), $la) == 1) {
-        ra($la, $lb);
-        $result[] = "ra";
-    } else if (array_search(max($la), $la) == 0 && array_search(min($la), $la) == 2) {
-        sa($la, $lb);
-        $result[] = "sa";
-        rra($la, $lb);
-        $result[] = "rra";
-    } else if (array_search(max($la), $la) == 1 && array_search(min($la), $la) == 0) {
-        sa($la, $lb);
-        $result[] = "sa";
-        ra($la, $lb);
-        $result[] = "ra";
-    } else if (array_search(max($la), $la) == 1 && array_search(min($la), $la) == 2) {
-        rra($la, $lb);
-        $result[] = "rra";
+        foreach ($copy as $key => $value) {
+            if ($key == 0) continue;
+
+            if ($search >= $copy[$key - 1] && $search < $value) {
+                return array_search($copy[$key - 1], $arr);
+            }
+        }
+        return array_search(max($arr), $arr);
     }
 }
 
-while (count($lb)) {
-    pa($la, $lb);
-    $result[] = "pa";
+//create random array
+function createRandomArray($start, $end)
+{
+    $rand = range($start, $end);
+    shuffle($rand);
+    return $rand;
 }
 
-echo implode(" ", $result) . "\n";
+$min = 0;
+$avg = [];
+
+for ($i = 0; $i < 1000; $i++) {
+    $la = createRandomArray(1, 999);
+    $la = array_slice($la, 0, 100);
+
+    $pushswap = new MySort($la);
+    $resArray = $pushswap->sort();
+
+    $avg[] = count($resArray);
+
+    if ($i == 0) {
+        $min = count($resArray);
+    } else if (count($resArray) < $min) {
+        $min = count($resArray);
+    }
+}
+
+$avg = array_sum($avg) / count($avg);
+
+echo "Average : " . $avg . PHP_EOL;
+echo "Minimum : " . $min . PHP_EOL;
