@@ -11,7 +11,6 @@ $result = [];
 //array de test
 // $la = createRandomArray(1, 999);
 // $la = array_slice($la, 0, 100);
-// var_dump($la);
 
 $laCopyOne = $la;
 sort($laCopyOne);
@@ -138,9 +137,5 @@ while (count($lb)) {
     pa($la, $lb);
     $result[] = "pa";
 }
-
-// var_dump($la);
-// var_dump($lb);
-// var_dump($result);
 
 echo implode(" ", $result) . "\n";
